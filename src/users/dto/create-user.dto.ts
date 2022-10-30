@@ -27,4 +27,7 @@ export class CreateUserDto {
     message: `Должен быть не меньше ${passwordMinLength} и не больше ${passwordMaxLength}!`,
   })
   readonly password: string;
+
+  @IsString({ message: 'Должен быть строкой!' })
+  readonly refreshToken?: string;
 }

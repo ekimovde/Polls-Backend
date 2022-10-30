@@ -9,7 +9,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript';
 import { User } from 'src/users/users.model';
-import { TABLE_NAME } from './attributes';
+import { TABLE_NAME } from './polls.attributes';
 import { PollCategory, PollColor } from './model';
 
 interface PollCreationAttrs {

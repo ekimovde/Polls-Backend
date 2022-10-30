@@ -19,6 +19,7 @@ interface UserCreationAttrs {
   nickName: string;
   email: string;
   password: string;
+  refreshToken?: string;
 }
 
 @Table({
@@ -70,6 +71,9 @@ export class User extends Model<User, UserCreationAttrs> {
     allowNull: false,
   })
   password: string;
+
+  @Column({ type: DataType.STRING })
+  refreshToken: string;
 
   @CreatedAt
   created: Date;

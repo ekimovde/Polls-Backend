@@ -2,9 +2,9 @@ import { IsString, Length, IsEmail } from 'class-validator';
 import {
   passwordMaxLength,
   passwordMinLength,
-} from 'src/users/dto/create-user-dto';
+} from 'src/users/dto/create-user.dto';
 
-export class LoginUserDto {
+export class AuthDto {
   @IsString({ message: 'Должен быть строкой!' })
   @IsEmail({}, { message: 'Некорректный Email!' })
   readonly email: string;

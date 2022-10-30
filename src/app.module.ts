@@ -9,6 +9,7 @@ import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
+import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import * as path from 'path';
       models: [User, Poll],
       autoLoadModels: true,
     }),
+    NestjsFormDataModule.config({ storage: MemoryStoredFile }),
     UsersModule,
     PollsModule,
     FilesModule,
