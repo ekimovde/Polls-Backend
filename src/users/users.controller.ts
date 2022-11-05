@@ -16,6 +16,7 @@ import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { AuthTokenPayload } from 'src/shared/constants';
 import { getResponseForm } from 'src/shared/utils/get-response-form';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PasswordUserDto } from './dto/password-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
@@ -36,10 +37,25 @@ export class UsersController {
     return getResponseForm(await this.usersService.findAll());
   }
 
-  @Patch(':id')
+  @Patch('set-user-info')
   @UseGuards(AuthJwtGuard)
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return getResponseForm(await this.usersService.update(id, updateUserDto));
+  async update(@Req() request: Request, @Body() updateUserDto: UpdateUserDto) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(
+      await this.usersService.update(user.id, updateUserDto),
+    );
+  }
+
+  @Patch('set-user-password')
+  @UseGuards(AuthJwtGuard)
+  async setUserPassword(
+    @Req() request: Request,
+    @Body() passwordUserDto: PasswordUserDto,
+  ) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(
+      await this.usersService.setUserPassword(user.id, passwordUserDto),
+    );
   }
 
   @Delete(':id')

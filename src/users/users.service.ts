@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import * as argon2 from 'argon2';
 import { FilesService } from 'src/files/files.service';
-import { ApiWrapper } from 'src/shared/constants';
-import { getResponseForm } from 'src/shared/utils/get-response-form';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PasswordUserDto } from './dto/password-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.model';
 
@@ -30,13 +30,33 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<void> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     await this.userRepository.update(updateUserDto, { where: { id } });
+    return await this.userRepository.findByPk(id);
   }
 
-  async getUsers(): Promise<ApiWrapper<User[]>> {
-    const users = await this.userRepository.findAll({ include: { all: true } });
-    return getResponseForm<User[]>(users);
+  async setUserPassword(
+    id: number,
+    passwordUserDto: PasswordUserDto,
+  ): Promise<User> {
+    const user = await this.userRepository.findByPk(id);
+
+    if (!user) {
+      throw new HttpException(
+        'Пользователь не найден!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const { password, newPassword } = passwordUserDto;
+    const passwordMatches = await argon2.verify(user.password, password);
+
+    if (!passwordMatches) {
+      throw new HttpException('Пароль не совпадает!', HttpStatus.BAD_REQUEST);
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+    return await this.update(id, { password: hashedPassword });
   }
 
   async remove(id: number): Promise<void> {
