@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ApiWrapper } from 'src/shared/constants';
-import { getResponseForm } from 'src/shared/utils/get-response-form';
-import { CreatePollDto } from './dto/create-poll-dto';
+import { CreatePollDto } from './dto/create-poll.dto';
+import { UpdatePollDto } from './dto/update-poll.dto';
 import { Poll } from './polls.model';
 
 @Injectable()
@@ -11,15 +10,23 @@ export class PollsService {
     @InjectModel(Poll) private readonly pollRepository: typeof Poll,
   ) {}
 
-  async getPolls(): Promise<ApiWrapper<Poll[]>> {
-    const polls = await this.pollRepository.findAll();
-
-    return getResponseForm<Poll[]>(polls);
+  async create(createPollDto: CreatePollDto): Promise<Poll> {
+    return await this.pollRepository.create(createPollDto);
   }
 
-  async create(dto: CreatePollDto): Promise<ApiWrapper<Poll>> {
-    const poll = await this.pollRepository.create(dto);
+  async findAll(): Promise<Poll[]> {
+    return await this.pollRepository.findAll();
+  }
 
-    return getResponseForm<Poll>(poll);
+  async findById(id: number): Promise<Poll> {
+    return await this.pollRepository.findByPk(id);
+  }
+
+  async update(id: number, updatePollDto: UpdatePollDto): Promise<void> {
+    await this.pollRepository.update(updatePollDto, { where: { id } });
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.pollRepository.destroy({ where: { id } });
   }
 }

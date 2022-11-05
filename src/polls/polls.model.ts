@@ -56,7 +56,7 @@ export class Poll extends Model<Poll, PollCreationAttrs> {
     allowNull: true,
     defaultValue: true,
   })
-  isPublic: string;
+  isPublic: boolean;
 
   @BelongsTo(() => User)
   author: User;
