@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsBoolean } from 'class-validator';
 import { PollCategory, PollColor } from '../model';
 
 export class CreatePollDto {
@@ -14,6 +14,5 @@ export class CreatePollDto {
   @IsBoolean({ message: 'Должен быть булевым значением!' })
   readonly isPublic: boolean;
 
-  @IsNumber({}, { message: 'Должен быть числом!' })
-  readonly userId: number;
+  readonly userId?: number;
 }

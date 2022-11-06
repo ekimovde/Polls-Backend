@@ -36,6 +36,13 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
+    defaultValue: '',
+  })
+  avatar: string;
+
+  @Column({
+    type: DataType.STRING,
     allowNull: false,
   })
   firstName: string;

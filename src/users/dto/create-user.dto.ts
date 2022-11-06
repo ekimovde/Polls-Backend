@@ -7,6 +7,9 @@ export const regexForTelegramNickname = /^[A-Za-z\d_]{5,32}$/;
 
 export class CreateUserDto {
   @IsString({ message: 'Должно быть строкой!' })
+  readonly avatar?: string;
+
+  @IsString({ message: 'Должно быть строкой!' })
   readonly firstName: string;
 
   @IsString({ message: 'Должно быть строкой!' })
