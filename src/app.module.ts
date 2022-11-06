@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
 import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
     PollsModule,
     FilesModule,
     AuthModule,
+    MailModule,
   ],
 })
 export class AppModule {}
