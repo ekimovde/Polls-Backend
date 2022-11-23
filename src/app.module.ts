@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
 import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
 import { MailModule } from './mail/mail.module';
+import { PollsMembersModule } from './polls-members/polls-members.module';
+import { PollsMembers } from './polls-members/polls-members.model';
 
 @Module({
   imports: [
@@ -27,12 +29,13 @@ import { MailModule } from './mail/mail.module';
       username: process.env.POSTGRES_USERNAME,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
-      models: [User, Poll],
+      models: [User, Poll, PollsMembers],
       autoLoadModels: true,
     }),
     NestjsFormDataModule.config({ storage: MemoryStoredFile }),
     UsersModule,
     PollsModule,
+    PollsMembersModule,
     FilesModule,
     AuthModule,
     MailModule,
