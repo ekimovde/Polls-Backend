@@ -1,8 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MailService } from 'src/mail/mail.service';
+import { PollsMembersService } from 'src/polls-members/polls-members.service';
 import { User } from 'src/users/users.model';
 import { CreatePollDto } from './dto/create-poll.dto';
+import { JoinPollDto } from './dto/join-poll.dtdo';
 import { SendInvitePollDto } from './dto/send-invite-poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
 import { Poll } from './polls.model';
@@ -11,18 +13,45 @@ import { Poll } from './polls.model';
 export class PollsService {
   constructor(
     @InjectModel(Poll) private readonly pollRepository: typeof Poll,
+    private readonly pollsMembersService: PollsMembersService,
     private readonly mailService: MailService,
   ) {}
 
   async create(createPollDto: CreatePollDto): Promise<Poll> {
-    return await this.pollRepository.create(createPollDto);
+    const poll = await this.pollRepository.create(createPollDto);
+
+    await this.pollsMembersService.create(poll.id, createPollDto.userId);
+
+    return poll;
   }
 
-  async findAll(): Promise<Poll[]> {
-    return await this.pollRepository.findAll();
+  async findAll(scope: string): Promise<Poll[]> {
+    return await this.pollRepository.findAll({
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+        {
+          model: User,
+          as: 'members',
+          attributes: ['id'],
+        },
+      ],
+      attributes: [
+        'id',
+        'name',
+        'color',
+        'category',
+        'isPublic',
+        'created',
+        ...this.getAttributesByScope(scope),
+      ],
+    });
   }
 
-  async findAllMy(userId: number): Promise<Poll[]> {
+  async findAllMy(userId: number, scope: string): Promise<Poll[]> {
     return await this.pollRepository.findAll({
       include: [
         {
@@ -30,12 +59,53 @@ export class PollsService {
           as: 'author',
           where: { id: userId },
         },
+        {
+          model: User,
+          as: 'members',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+      ],
+      attributes: [
+        'id',
+        'name',
+        'color',
+        'category',
+        'isPublic',
+        'created',
+        ...this.getAttributesByScope(scope),
       ],
     });
   }
 
   async findById(id: number): Promise<Poll> {
-    return await this.pollRepository.findByPk(id);
+    return await this.pollRepository.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+        {
+          model: User,
+          as: 'members',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+      ],
+    });
+  }
+
+  async findAllMembers(id: number): Promise<User[]> {
+    const poll = await this.pollRepository.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: 'members',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+      ],
+    });
+
+    return poll.members;
   }
 
   async update(
@@ -57,6 +127,11 @@ export class PollsService {
     await this.mailService.sendMail(emailTo, description);
   }
 
+  async join(joinPollDto: JoinPollDto): Promise<void> {
+    const { pollId, userId } = joinPollDto;
+    await this.pollsMembersService.create(pollId, userId);
+  }
+
   async isMyPoll(userId: number, pollId: number): Promise<void> {
     const poll = await this.findById(pollId);
 
@@ -65,5 +140,9 @@ export class PollsService {
     }
 
     throw new HttpException('Нет прав для удаления!', HttpStatus.BAD_REQUEST);
+  }
+
+  getAttributesByScope(scope: string): string[] {
+    return scope ? scope.split(',') : [];
   }
 }

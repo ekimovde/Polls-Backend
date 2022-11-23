@@ -16,6 +16,7 @@ import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { AuthTokenPayload } from 'src/shared/constants';
 import { getResponseForm } from 'src/shared/utils/get-response-form';
 import { CreatePollDto } from './dto/create-poll.dto';
+import { JoinPollDto } from './dto/join-poll.dtdo';
 import { SendInvitePollDto } from './dto/send-invite-poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
 import { PollsService } from './polls.service';
@@ -34,17 +35,26 @@ export class PollsController {
     );
   }
 
-  @Get()
+  @Post('all')
   @UseGuards(AuthJwtGuard)
-  async findAll() {
-    return getResponseForm(await this.pollService.findAll());
+  async findAll(@Body() { scope }: { scope: string }) {
+    return getResponseForm(await this.pollService.findAll(scope));
   }
 
-  @Get('my')
+  @Post('my')
   @UseGuards(AuthJwtGuard)
-  async findAllMy(@Req() request: Request) {
+  async findAllMy(
+    @Req() request: Request,
+    @Body() { scope }: { scope: string },
+  ) {
     const user = request['user'] as Partial<AuthTokenPayload>;
-    return getResponseForm(await this.pollService.findAllMy(user.id));
+    return getResponseForm(await this.pollService.findAllMy(user.id, scope));
+  }
+
+  @Get('members/:id')
+  @UseGuards(AuthJwtGuard)
+  async findAllMembers(@Param('id') id: number) {
+    return getResponseForm(await this.pollService.findAllMembers(id));
   }
 
   @Patch(':id')
@@ -79,5 +89,11 @@ export class PollsController {
     return getResponseForm(
       await this.pollService.sendInvite(sendInvitePollDto),
     );
+  }
+
+  @Post('join')
+  @UseGuards(AuthJwtGuard)
+  async join(@Body() joinPollDto: JoinPollDto) {
+    return getResponseForm(await this.pollService.join(joinPollDto));
   }
 }

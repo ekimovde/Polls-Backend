@@ -7,8 +7,9 @@ import {
   BeforeUpdate,
   CreatedAt,
   UpdatedAt,
-  HasMany,
+  BelongsToMany,
 } from 'sequelize-typescript';
+import { PollsMembers } from 'src/polls-members/polls-members.model';
 import { Poll } from 'src/polls/polls.model';
 import { TABLE_NAME } from './attributes';
 
@@ -94,6 +95,6 @@ export class User extends Model<User, UserCreationAttrs> {
     instance.fullName = `${instance.firstName} ${instance.lastName}`;
   }
 
-  @HasMany(() => Poll)
+  @BelongsToMany(() => Poll, () => PollsMembers)
   polls: Poll[];
 }
