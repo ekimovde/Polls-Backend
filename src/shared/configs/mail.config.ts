@@ -7,6 +7,8 @@ export const getMailConfig = async (
   const mailFromName = configService.get<string>('MAIL_FROM_NAME');
   const mailFromAddress = transport.split(':')[1].split('//')[1];
 
+  console.log(mailFromAddress);
+
   return {
     transport,
     defaults: {

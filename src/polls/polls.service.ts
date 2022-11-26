@@ -142,6 +142,10 @@ export class PollsService {
     throw new HttpException('Нет прав для удаления!', HttpStatus.BAD_REQUEST);
   }
 
+  async getQuantityPollsByUserId(userId: number): Promise<number> {
+    return await this.pollRepository.count({ where: { userId } });
+  }
+
   getAttributesByScope(scope: string): string[] {
     return scope ? scope.split(',') : [];
   }

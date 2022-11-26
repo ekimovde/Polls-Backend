@@ -70,4 +70,11 @@ export class UsersController {
     const user = request['user'] as Partial<AuthTokenPayload>;
     return getResponseForm(await this.usersService.findById(user.id));
   }
+
+  @Get('/progress')
+  @UseGuards(AuthJwtGuard)
+  async getUserProgress(@Req() request: Request) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(await this.usersService.getUserProgress(user.id));
+  }
 }

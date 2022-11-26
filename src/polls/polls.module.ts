@@ -14,6 +14,7 @@ import { PollsMembersModule } from 'src/polls-members/polls-members.module';
     MailModule,
     PollsMembersModule,
   ],
+  exports: [PollsService],
   providers: [PollsService],
   controllers: [PollsController],
 })

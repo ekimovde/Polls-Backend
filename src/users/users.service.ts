@@ -2,6 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as argon2 from 'argon2';
 import { FilesService } from 'src/files/files.service';
+import { Poll } from 'src/polls/polls.model';
+import { PollsService } from 'src/polls/polls.service';
+import { UserProgressResponse } from 'src/shared/constants';
+import { fakeUserProgressValue } from 'src/shared/fixtures/fake-user-progress';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PasswordUserDto } from './dto/password-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,6 +16,7 @@ export class UsersService {
   constructor(
     @InjectModel(User) private readonly userRepository: typeof User,
     private readonly fileService: FilesService,
+    private readonly pollsService: PollsService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -61,5 +66,34 @@ export class UsersService {
 
   async remove(id: number): Promise<void> {
     await this.userRepository.destroy({ where: { id } });
+  }
+
+  async getUserProgress(id: number): Promise<UserProgressResponse> {
+    const quantityOfCreatedPolls =
+      await this.pollsService.getQuantityPollsByUserId(id);
+    const quantityOfConsistsPolls: number =
+      await this.getQuantityOfConsistsPolls(id);
+
+    const created = fakeUserProgressValue({ count: quantityOfCreatedPolls });
+    const consists = fakeUserProgressValue({ count: quantityOfConsistsPolls });
+    const participation = fakeUserProgressValue();
+
+    return {
+      created,
+      consists,
+      participation,
+    };
+  }
+
+  async getQuantityOfConsistsPolls(id: number): Promise<number> {
+    return await this.userRepository.count({
+      where: { id },
+      include: [
+        {
+          model: Poll,
+          as: 'polls',
+        },
+      ],
+    });
   }
 }
