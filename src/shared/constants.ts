@@ -1,6 +1,8 @@
 export const DEFAULT_COUNT_OF_USER_PROGRESS = 0;
 export const DEFAULT_TOTAL_OF_USER_PROGRESS = 100;
 
+export const DEFAULT_LIMIT_OF_POPULAR_POLLS = 5;
+
 export interface ApiResponse {
   status?: string;
   description?: string;

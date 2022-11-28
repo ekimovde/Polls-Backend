@@ -96,4 +96,11 @@ export class PollsController {
   async join(@Body() joinPollDto: JoinPollDto) {
     return getResponseForm(await this.pollService.join(joinPollDto));
   }
+
+  @Get()
+  @UseGuards(AuthJwtGuard)
+  async getPopularPolls(@Req() request: Request) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(await this.pollService.getPopularPolls(user.id));
+  }
 }

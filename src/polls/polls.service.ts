@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MailService } from 'src/mail/mail.service';
 import { PollsMembersService } from 'src/polls-members/polls-members.service';
+import { DEFAULT_LIMIT_OF_POPULAR_POLLS } from 'src/shared/constants';
 import { User } from 'src/users/users.model';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dtdo';
@@ -130,6 +131,20 @@ export class PollsService {
   async join(joinPollDto: JoinPollDto): Promise<void> {
     const { pollId, userId } = joinPollDto;
     await this.pollsMembersService.create(pollId, userId);
+  }
+
+  async getPopularPolls(userId: number): Promise<Poll[]> {
+    return await this.pollRepository.findAll({
+      where: { userId },
+      limit: DEFAULT_LIMIT_OF_POPULAR_POLLS,
+      include: [
+        {
+          model: User,
+          as: 'members',
+          attributes: ['id', 'fullName', 'avatar'],
+        },
+      ],
+    });
   }
 
   async isMyPoll(userId: number, pollId: number): Promise<void> {

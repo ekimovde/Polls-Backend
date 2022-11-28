@@ -13,6 +13,9 @@ import { NestjsFormDataModule, MemoryStoredFile } from 'nestjs-form-data';
 import { MailModule } from './mail/mail.module';
 import { PollsMembersModule } from './polls-members/polls-members.module';
 import { PollsMembers } from './polls-members/polls-members.model';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -32,6 +35,28 @@ import { PollsMembers } from './polls-members/polls-members.model';
       models: [User, Poll, PollsMembers],
       autoLoadModels: true,
     }),
+    MailerModule.forRoot({
+      // transport: {
+      //   host: 'smtp.yandex.ru',
+      //   auth: {
+      //     user: 'ekimov@yandex.ru',
+      //     pass: 'awenoxehbqrvqqqk',
+      //   },
+      // },
+      transport: process.env.MAIL_TRANSPORT,
+      defaults: {
+        from: `${process.env.MAIL_FROM_NAME} ${process.env.MAIL_FROM_ADDRESS}`,
+      },
+      template: {
+        dir: join(__dirname, 'mails'),
+        adapter: new HandlebarsAdapter(),
+      },
+    }),
+    // MailerModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: getMailConfig,
+    // }),
     NestjsFormDataModule.config({ storage: MemoryStoredFile }),
     UsersModule,
     PollsModule,
