@@ -3,6 +3,9 @@ export const DEFAULT_TOTAL_OF_USER_PROGRESS = 100;
 
 export const DEFAULT_LIMIT_OF_POPULAR_POLLS = 5;
 
+export const SORT_ATTR_FOR_POLLS = 'created';
+export const SORT_TYPE_FOR_POLLS = 'DESC';
+
 export interface ApiResponse {
   status?: string;
   description?: string;

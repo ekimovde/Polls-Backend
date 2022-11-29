@@ -2,7 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MailService } from 'src/mail/mail.service';
 import { PollsMembersService } from 'src/polls-members/polls-members.service';
-import { DEFAULT_LIMIT_OF_POPULAR_POLLS } from 'src/shared/constants';
+import {
+  DEFAULT_LIMIT_OF_POPULAR_POLLS,
+  SORT_ATTR_FOR_POLLS,
+  SORT_TYPE_FOR_POLLS,
+} from 'src/shared/constants';
 import { User } from 'src/users/users.model';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dtdo';
@@ -40,6 +44,7 @@ export class PollsService {
           attributes: ['id'],
         },
       ],
+      order: [[SORT_ATTR_FOR_POLLS, SORT_TYPE_FOR_POLLS]],
       attributes: [
         'id',
         'name',
@@ -66,6 +71,7 @@ export class PollsService {
           attributes: ['id', 'fullName', 'avatar'],
         },
       ],
+      order: [[SORT_ATTR_FOR_POLLS, SORT_TYPE_FOR_POLLS]],
       attributes: [
         'id',
         'name',
@@ -137,6 +143,7 @@ export class PollsService {
     return await this.pollRepository.findAll({
       where: { userId },
       limit: DEFAULT_LIMIT_OF_POPULAR_POLLS,
+      order: [[SORT_ATTR_FOR_POLLS, SORT_TYPE_FOR_POLLS]],
       include: [
         {
           model: User,
