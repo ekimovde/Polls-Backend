@@ -16,6 +16,8 @@ import { PollsMembers } from './polls-members/polls-members.model';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { PollsVotes } from './polls-votes/polls-votes.model';
+import { PollsVotesModule } from './polls-votes/polls-votes.module';
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       username: process.env.POSTGRES_USERNAME,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
-      models: [User, Poll, PollsMembers],
+      models: [User, Poll, PollsMembers, PollsVotes],
       autoLoadModels: true,
     }),
     MailerModule.forRoot({
@@ -61,6 +63,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     UsersModule,
     PollsModule,
     PollsMembersModule,
+    PollsVotesModule,
     FilesModule,
     AuthModule,
     MailModule,

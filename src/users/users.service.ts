@@ -68,30 +68,43 @@ export class UsersService {
     await this.userRepository.destroy({ where: { id } });
   }
 
-  async getUserProgress(id: number): Promise<UserProgressResponse> {
+  async getUserProgress(userId: number): Promise<UserProgressResponse> {
     const quantityOfCreatedPolls =
-      await this.pollsService.getQuantityPollsByUserId(id);
-    const quantityOfConsistsPolls: number =
-      await this.getQuantityOfConsistsPolls(id);
-
-    const created = fakeUserProgressValue({ count: quantityOfCreatedPolls });
-    const consists = fakeUserProgressValue({ count: quantityOfConsistsPolls });
-    const participation = fakeUserProgressValue();
+      await this.pollsService.getQuantityPollsByUserId(userId);
+    const quantityOfConsistsPolls = await this.getQuantityOfConsistsPolls(
+      userId,
+    );
+    const quantityOfParticipationPolls =
+      await this.getQuantityOfParticipationPolls(userId);
 
     return {
-      created,
-      consists,
-      participation,
+      created: fakeUserProgressValue({ count: quantityOfCreatedPolls }),
+      consists: fakeUserProgressValue({ count: quantityOfConsistsPolls }),
+      participation: fakeUserProgressValue({
+        count: quantityOfParticipationPolls,
+      }),
     };
   }
 
-  async getQuantityOfConsistsPolls(id: number): Promise<number> {
+  async getQuantityOfConsistsPolls(userId: number): Promise<number> {
     return await this.userRepository.count({
-      where: { id },
+      where: { id: userId },
       include: [
         {
           model: Poll,
           as: 'polls',
+        },
+      ],
+    });
+  }
+
+  async getQuantityOfParticipationPolls(userId: number): Promise<number> {
+    return await this.userRepository.count({
+      where: { id: userId },
+      include: [
+        {
+          model: Poll,
+          as: 'votes',
         },
       ],
     });

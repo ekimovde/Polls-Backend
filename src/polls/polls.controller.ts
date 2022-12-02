@@ -13,11 +13,13 @@ import {
 import { Request } from 'express';
 import { AuthJwtGuard } from 'src/common/guards/auth.guard';
 import { ValidationPipe } from 'src/pipes/validation.pipe';
+import { CreateVoteDto } from 'src/polls-votes/dto/create-vote.dto';
 import { AuthTokenPayload } from 'src/shared/constants';
 import { getResponseForm } from 'src/shared/utils/get-response-form';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dtdo';
 import { SendInvitePollDto } from './dto/send-invite-poll.dto';
+import { SetVotePollDto } from './dto/set-vote.poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
 import { PollsService } from './polls.service';
 
@@ -102,5 +104,32 @@ export class PollsController {
   async getPopularPolls(@Req() request: Request) {
     const user = request['user'] as Partial<AuthTokenPayload>;
     return getResponseForm(await this.pollService.getPopularPolls(user.id));
+  }
+
+  @Post('set-vote')
+  @UseGuards(AuthJwtGuard)
+  async setVote(
+    @Req() request: Request,
+    @Body() setVotePollDto: SetVotePollDto,
+  ) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(
+      await this.pollService.setVote(<CreateVoteDto>{
+        ...setVotePollDto,
+        userId: user.id,
+      }),
+    );
+  }
+
+  @Get('vote/results/:id')
+  @UseGuards(AuthJwtGuard)
+  async getPollVoteResults(
+    @Req() request: Request,
+    @Param('id') pollId: number,
+  ) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(
+      await this.pollService.getPollVoteResults(user.id, pollId),
+    );
   }
 }

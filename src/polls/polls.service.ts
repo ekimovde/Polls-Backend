@@ -2,16 +2,21 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MailService } from 'src/mail/mail.service';
 import { PollsMembersService } from 'src/polls-members/polls-members.service';
+import { CreateVoteDto } from 'src/polls-votes/dto/create-vote.dto';
+import { PollsVotesService } from 'src/polls-votes/polls-votes.service';
 import {
   DEFAULT_LIMIT_OF_POPULAR_POLLS,
   SORT_ATTR_FOR_POLLS,
   SORT_TYPE_FOR_POLLS,
 } from 'src/shared/constants';
+import { setVotesByTimestamp } from 'src/shared/utils/set-votes-by-timestamp';
+import { timestampIdsAndQuantitiesInPoll } from 'src/shared/utils/timestamp-ids-and-quantities-in-poll';
 import { User } from 'src/users/users.model';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dtdo';
 import { SendInvitePollDto } from './dto/send-invite-poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
+import { PollQuestionAnswer, PollVoteResults } from './model';
 import { Poll } from './polls.model';
 
 @Injectable()
@@ -19,6 +24,7 @@ export class PollsService {
   constructor(
     @InjectModel(Poll) private readonly pollRepository: typeof Poll,
     private readonly pollsMembersService: PollsMembersService,
+    private readonly pollsVotesService: PollsVotesService,
     private readonly mailService: MailService,
   ) {}
 
@@ -139,6 +145,43 @@ export class PollsService {
     await this.pollsMembersService.create(pollId, userId);
   }
 
+  async setVote(createVoteDto: CreateVoteDto): Promise<void> {
+    await this.pollsVotesService.create(createVoteDto);
+  }
+
+  async getPollVoteResults(
+    userId: number,
+    pollId: number,
+  ): Promise<PollVoteResults> {
+    const pollQuestionAnswers = await this.getQuestionAnswersById(pollId);
+    const pollVoteUsers = await this.pollsVotesService.findAllVoteUsersByPollId(
+      pollId,
+    );
+    const quantityOfVotes =
+      await this.pollsVotesService.getQuantityOfVotesByPollId(pollId);
+    const selectedAnswers = await this.pollsVotesService.findAllByPollId(
+      pollId,
+    );
+    const selectedAnswer = selectedAnswers.find(
+      (item) => item.userId === userId,
+    );
+
+    const timestampIdsAndQuantities =
+      timestampIdsAndQuantitiesInPoll(pollQuestionAnswers);
+
+    const hasSelectedAnswer = Boolean(selectedAnswer);
+
+    return {
+      total: quantityOfVotes,
+      progress: setVotesByTimestamp(timestampIdsAndQuantities, selectedAnswers),
+      answers: pollQuestionAnswers,
+      users: pollVoteUsers,
+      selectedAnswer: hasSelectedAnswer
+        ? Number(selectedAnswer.timestamp)
+        : null,
+    };
+  }
+
   async getPopularPolls(userId: number): Promise<Poll[]> {
     return await this.pollRepository.findAll({
       where: { userId },
@@ -166,6 +209,14 @@ export class PollsService {
 
   async getQuantityPollsByUserId(userId: number): Promise<number> {
     return await this.pollRepository.count({ where: { userId } });
+  }
+
+  async getQuestionAnswersById(id: number): Promise<PollQuestionAnswer[]> {
+    const poll = await this.pollRepository.findByPk(id, {
+      attributes: ['question'],
+    });
+
+    return poll.question.answers;
   }
 
   getAttributesByScope(scope: string): string[] {

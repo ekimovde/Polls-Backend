@@ -19,6 +19,7 @@ import {
   PollTime,
 } from './model';
 import { PollsMembers } from 'src/polls-members/polls-members.model';
+import { PollsVotes } from 'src/polls-votes/polls-votes.model';
 
 interface PollCreationAttrs {
   id: number;
@@ -96,6 +97,9 @@ export class Poll extends Model<Poll, PollCreationAttrs> {
 
   @BelongsToMany(() => User, () => PollsMembers)
   members: User[];
+
+  @BelongsToMany(() => User, () => PollsVotes)
+  votes: PollsVotes[];
 
   @CreatedAt
   created: Date;

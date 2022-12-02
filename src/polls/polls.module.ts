@@ -6,6 +6,7 @@ import { Poll } from './polls.model';
 import { AuthModule } from 'src/auth/auth.module';
 import { MailModule } from 'src/mail/mail.module';
 import { PollsMembersModule } from 'src/polls-members/polls-members.module';
+import { PollsVotesModule } from 'src/polls-votes/polls-votes.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PollsMembersModule } from 'src/polls-members/polls-members.module';
     AuthModule,
     MailModule,
     PollsMembersModule,
+    PollsVotesModule,
   ],
   exports: [PollsService],
   providers: [PollsService],

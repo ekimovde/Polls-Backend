@@ -1,3 +1,5 @@
+import { User } from 'src/users/users.model';
+
 export enum PollColor {
   purple = 'purple',
   orange = 'orange',
@@ -73,3 +75,16 @@ export interface PollQuestionSettings {
   isMultipleAnswers: boolean;
   ownImage: string;
 }
+
+export type PollTimestamp = number;
+export type PollQuantity = number;
+
+export interface PollVoteResults {
+  total: number;
+  progress: PollVoteProgress;
+  answers: PollQuestionAnswer[];
+  users: User[];
+  selectedAnswer: number;
+}
+
+export type PollVoteProgress = Record<number, number>;

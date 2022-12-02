@@ -10,6 +10,7 @@ import {
   BelongsToMany,
 } from 'sequelize-typescript';
 import { PollsMembers } from 'src/polls-members/polls-members.model';
+import { PollsVotes } from 'src/polls-votes/polls-votes.model';
 import { Poll } from 'src/polls/polls.model';
 import { TABLE_NAME } from './attributes';
 
@@ -97,4 +98,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @BelongsToMany(() => Poll, () => PollsMembers)
   polls: Poll[];
+
+  @BelongsToMany(() => Poll, () => PollsVotes)
+  votes: PollsVotes[];
 }
