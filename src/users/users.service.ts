@@ -87,7 +87,7 @@ export class UsersService {
   }
 
   async getQuantityOfConsistsPolls(userId: number): Promise<number> {
-    return await this.userRepository.count({
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       include: [
         {
@@ -96,10 +96,12 @@ export class UsersService {
         },
       ],
     });
+
+    return user.polls.length;
   }
 
   async getQuantityOfParticipationPolls(userId: number): Promise<number> {
-    return await this.userRepository.count({
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       include: [
         {
@@ -108,5 +110,7 @@ export class UsersService {
         },
       ],
     });
+
+    return user.votes.length;
   }
 }

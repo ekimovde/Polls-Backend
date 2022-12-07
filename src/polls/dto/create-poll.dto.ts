@@ -29,5 +29,7 @@ export class CreatePollDto {
   @IsBoolean({ message: 'Должен быть булевым значением!' })
   readonly isPublic: boolean;
 
+  readonly isPollEnded?: boolean;
+
   readonly userId?: number;
 }

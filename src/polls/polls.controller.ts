@@ -132,4 +132,11 @@ export class PollsController {
       await this.pollService.getPollVoteResults(user.id, pollId),
     );
   }
+
+  @Get('end/:id')
+  @UseGuards(AuthJwtGuard)
+  async endPoll(@Req() request: Request, @Param('id') pollId: number) {
+    const user = request['user'] as Partial<AuthTokenPayload>;
+    return getResponseForm(await this.pollService.endPoll(user.id, pollId));
+  }
 }

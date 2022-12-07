@@ -197,6 +197,24 @@ export class PollsService {
     });
   }
 
+  async endPoll(userId: number, pollId: number): Promise<void> {
+    const candidate = await this.pollRepository.findOne({
+      where: { userId, id: pollId },
+    });
+
+    if (!candidate) {
+      throw new HttpException(
+        'Вы не являетесь автором опроса!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.pollRepository.update(
+      { isPollEnded: true },
+      { where: { id: pollId } },
+    );
+  }
+
   async isMyPoll(userId: number, pollId: number): Promise<void> {
     const poll = await this.findById(pollId);
 

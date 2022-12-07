@@ -31,7 +31,7 @@ export const setVotesByTimestamp = (
     const key = keysOfTimestampIdsAndQuantities[index];
     const value = timestampIdsAndQuantitiesInPoll[key] / quantityOfAnswers;
 
-    timestampIdsAndQuantitiesInPoll[key] = Math.round(value * 100);
+    timestampIdsAndQuantitiesInPoll[key] = value ? Math.round(value * 100) : 0;
   }
 
   return { ...timestampIdsAndQuantitiesInPoll };

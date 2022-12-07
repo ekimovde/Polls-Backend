@@ -88,6 +88,13 @@ export class Poll extends Model<Poll, PollCreationAttrs> {
   })
   isPublic: boolean;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: false,
+  })
+  isPollEnded: boolean;
+
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER })
   userId: number;
